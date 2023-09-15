@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const noRoute = require("./middlewares/noRoute");
 const errorHandlerMiddleware = require("./middlewares/ErrorHandlerMiddleware");
 const connectDabatase = require("./db/connect");
+const authRouter = require("./routers/auth");
 
 const app = express();
 dotenv.config();
@@ -10,6 +11,7 @@ const port = process.env.port || 3000;
 
 //routes
 app.use(express.json());
+app.use("/api/auth", authRouter);
 
 //error handler middleware
 app.use(errorHandlerMiddleware);
