@@ -1,7 +1,6 @@
 const User = require("../models/user");
 const catchAsync = require("../middlewares/catchAsync");
 const ErrorHandler = require("../middlewares/errorHandler");
-const { request } = require("express");
 
 //user registration
 const userRegistration = catchAsync(async (req, res, next) => {

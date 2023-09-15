@@ -11,6 +11,10 @@ const port = process.env.port || 3000;
 
 //routes
 app.use(express.json());
+app.use(
+  "/public/uploads/userImages/",
+  express.static("public/uploads/userImages")
+);
 app.use("/api/auth", authRouter);
 
 //error handler middleware
