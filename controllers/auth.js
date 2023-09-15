@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const catchAsync = require("../middlewares/catchAsync");
 const ErrorHandler = require("../middlewares/errorHandler");
+const { request } = require("express");
 
 //user registration
 const userRegistration = catchAsync(async (req, res, next) => {
@@ -16,23 +17,45 @@ const userRegistration = catchAsync(async (req, res, next) => {
     );
   }
 
-  const newUser = await User.create(req.body);
+  //for saving user's image in database
+  const file = req.file;
+  if (!file) {
+    const newUser = await User.create({
+      name: req.body.name,
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+      cpassword: req.body.cpassword,
+    });
+    newUser.save();
 
-  //   {
-  //     name: req.body.name,
-  //     username: req.body.username,
-  //     email: req.body.email,
-  //     password: req.body.password,
-  //     cpassword: req.body.cpassword,
+    if (!newUser) {
+      return next(
+        new ErrorHandler("Something went wrong, User not created!", 500)
+      );
+    }
+  } else {
+    const filename = file.filename;
+    const basepath = `${req.protocol}://${req.get(
+      "host"
+    )}/public/uploads/userImages/`;
 
-  //   }
+    const newUser = await User.create({
+      name: req.body.name,
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
+      cpassword: req.body.cpassword,
+      image: `${basepath}${filename}`,
+    });
 
-  newUser.save();
+    newUser.save();
 
-  if (!newUser) {
-    return next(
-      new ErrorHandler("Something went wrong, User not created!", 500)
-    );
+    if (!newUser) {
+      return next(
+        new ErrorHandler("Something went wrong, User not created!", 500)
+      );
+    }
   }
 
   res.status(201).json({ success: true, msg: "User created successfully" });
