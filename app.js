@@ -4,6 +4,7 @@ const noRoute = require("./middlewares/noRoute");
 const errorHandlerMiddleware = require("./middlewares/ErrorHandlerMiddleware");
 const connectDabatase = require("./db/connect");
 const authRouter = require("./routers/auth");
+const postRouter = require("./routers/post");
 
 const app = express();
 dotenv.config();
@@ -15,7 +16,13 @@ app.use(
   "/public/uploads/userImages/",
   express.static("public/uploads/userImages")
 );
+
+app.use(
+  "/public/uploads/postImages/",
+  express.static("public/uploads/postImages")
+);
 app.use("/api/auth", authRouter);
+app.use("/api/post", postRouter);
 
 //error handler middleware
 app.use(errorHandlerMiddleware);

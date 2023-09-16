@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
+const authentication = require("../middlewares/authentication");
 
-const { userRegistration, userLogin } = require("../controllers/auth");
+const { createPost } = require("../controllers/post");
 
-// multer for image upload
+// multer for image upload on post
 const FILE_TYPE_MAP = {
   "image/png": "png",
   "image/jpeg": "jpeg",
@@ -19,7 +20,7 @@ const storage = multer.diskStorage({
     if (isValid) {
       uploadError = null;
     }
-    cb(uploadError, "public/uploads/userImages");
+    cb(uploadError, "public/uploads/postImages");
   },
   filename: function (req, file, cb) {
     const fileName = file.originalname.split(" ").join("-");
@@ -31,15 +32,12 @@ const storage = multer.diskStorage({
 
 const uploadOptions = multer({ storage: storage });
 
-// Remember to set enctype="multipart/form-data" in your form.
-
-// <form action="/profile" method="post" enctype="multipart/form-data">
-//   <input type="file" name="avatar" />
-// </form>
-
-//routes
-router.post("/register", uploadOptions.single("image"), userRegistration);
-
-router.post("/login", userLogin);
+// routes
+router.post(
+  "/create",
+  authentication,
+  uploadOptions.array("images", 10),
+  createPost
+);
 
 module.exports = router;
