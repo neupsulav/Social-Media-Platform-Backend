@@ -4,6 +4,7 @@ const ErrorHandler = require("../middlewares/errorHandler");
 
 //creating post
 const createPost = catchAsync(async (req, res, next) => {
+  const userId = req.user.userId;
   const files = req.files;
   let imagePaths = [];
   const basepath = `${req.protocol}://${req.get(
@@ -19,6 +20,7 @@ const createPost = catchAsync(async (req, res, next) => {
   const post = await Post.create({
     caption: req.body.caption,
     images: imagePaths,
+    createdBy: userId,
   });
 
   post.save();
