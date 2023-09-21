@@ -9,7 +9,9 @@ const {
   createComment,
   likePost,
   getSinglePost,
+  updatePost,
 } = require("../controllers/post");
+const ownerValidation = require("../middlewares/ownerValidation");
 
 // multer for image upload on post
 const FILE_TYPE_MAP = {
@@ -53,5 +55,7 @@ router.post("/comment/:id", authentication, createComment);
 router.post("/like/:id", authentication, likePost);
 
 router.get("/:id", authentication, getSinglePost);
+
+router.patch("/update/:id", authentication, ownerValidation, updatePost);
 
 module.exports = router;

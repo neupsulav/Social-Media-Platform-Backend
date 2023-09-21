@@ -155,10 +155,26 @@ const getSinglePost = catchAsync(async (req, res, next) => {
   res.status(200).send(post);
 });
 
+// update a post
+const updatePost = catchAsync(async (req, res, next) => {
+  const postId = req.params.id;
+
+  const updatePost = await Post.findByIdAndUpdate({ _id: postId }, req.body, {
+    new: true,
+  });
+
+  if (!updatePost) {
+    return next(new ErrorHandler("Something went wrong", 400));
+  }
+
+  res.status(200).json({ msg: "Post updated" });
+});
+
 module.exports = {
   createPost,
   getPost,
   createComment,
   likePost,
   getSinglePost,
+  updatePost,
 };
