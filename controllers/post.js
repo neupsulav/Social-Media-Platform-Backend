@@ -32,4 +32,22 @@ const createPost = catchAsync(async (req, res, next) => {
   res.status(201).json({ msg: "Post created" });
 });
 
-module.exports = { createPost };
+//get posts
+const getPost = catchAsync(async (req, res, next) => {
+  const posts = await Post.find({})
+    .populate({
+      path: "createdBy",
+      select: "_id name username image",
+    })
+    .sort({ createdAt: -1 });
+
+  if (!posts) {
+    return next(new ErrorHandler("Something went wrong!", 404));
+  }
+
+  res.status(200).json(posts);
+});
+
+//comment on a post
+
+module.exports = { createPost, getPost };

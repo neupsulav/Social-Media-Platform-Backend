@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const authentication = require("../middlewares/authentication");
 
-const { createPost } = require("../controllers/post");
+const { createPost, getPost } = require("../controllers/post");
 
 // multer for image upload on post
 const FILE_TYPE_MAP = {
@@ -39,5 +39,7 @@ router.post(
   uploadOptions.array("images", 10),
   createPost
 );
+
+router.get("/", getPost);
 
 module.exports = router;
