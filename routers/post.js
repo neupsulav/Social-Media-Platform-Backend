@@ -10,6 +10,7 @@ const {
   likePost,
   getSinglePost,
   updatePost,
+  deletePost,
 } = require("../controllers/post");
 const ownerValidation = require("../middlewares/ownerValidation");
 
@@ -57,5 +58,7 @@ router.post("/like/:id", authentication, likePost);
 router.get("/:id", authentication, getSinglePost);
 
 router.patch("/update/:id", authentication, ownerValidation, updatePost);
+
+router.delete("/delete/:id", authentication, ownerValidation, deletePost);
 
 module.exports = router;

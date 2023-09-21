@@ -170,6 +170,23 @@ const updatePost = catchAsync(async (req, res, next) => {
   res.status(200).json({ msg: "Post updated" });
 });
 
+// Delete post
+const deletePost = catchAsync(async (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return next(new ErrorHandler("Invalid post ID", 400));
+  }
+
+  const postId = req.params.id;
+
+  const deletePost = await Post.findByIdAndRemove({ _id: postId });
+
+  if (!deletePost) {
+    return next(new ErrorHandler("Something went wrong", 400));
+  }
+
+  res.status(200).json({ msg: "Post deleted" });
+});
+
 module.exports = {
   createPost,
   getPost,
@@ -177,4 +194,5 @@ module.exports = {
   likePost,
   getSinglePost,
   updatePost,
+  deletePost,
 };
