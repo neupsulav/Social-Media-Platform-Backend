@@ -43,7 +43,7 @@ const getPost = catchAsync(async (req, res, next) => {
     })
     .populate({
       path: "comments",
-      select: "_id name username image commentcontent createdAt",
+      select: "_id name username image commentContent createdAt",
     })
     .sort({ createdAt: -1 });
 
@@ -60,13 +60,12 @@ const createComment = catchAsync(async (req, res, next) => {
     return next(new ErrorHandler("Invalid Post Id", 400));
   }
   const postId = req.params.id;
-  const commentContent = req.body.commentContent;
 
   const saveComment = await comments.create({
     image: req.user.userImage,
     username: req.user.username,
     name: req.user.name,
-    commentContent: commentContent,
+    commentContent: req.body.commentContent,
   });
 
   saveComment.save();
@@ -83,5 +82,21 @@ const createComment = catchAsync(async (req, res, next) => {
 
   res.status(201).json({ success: true });
 });
+
+// like and unlike a post
+// const likePost = catchAsync(async (req, res, next) => {
+//   if (!mongoose.isValidObjectId(req.params.id)) {
+//     return next(new ErrorHandler("Invalid User ID", 404));
+//   }
+
+//   const postId = req.params.id;
+
+//   // like a post
+//   const like = await Post.findByIdAndUpdate(
+//     { _id: postId },
+//     { $push: { likes: req.user.userId } },
+//     { new: true }
+//   );
+// });
 
 module.exports = { createPost, getPost, createComment };
