@@ -28,7 +28,7 @@ const createPost = catchAsync(async (req, res, next) => {
   post.save();
 
   if (!post) {
-    return next(new ErrorHandler("Something went wrong", 500));
+    return next(new ErrorHandler("Something went wrong", 400));
   }
 
   res.status(201).json({ msg: "Post created" });
@@ -48,7 +48,7 @@ const getPost = catchAsync(async (req, res, next) => {
     .sort({ createdAt: -1 });
 
   if (!posts) {
-    return next(new ErrorHandler("Something went wrong!", 404));
+    return next(new ErrorHandler("Something went wrong!", 400));
   }
 
   res.status(200).json(posts);
@@ -77,26 +77,58 @@ const createComment = catchAsync(async (req, res, next) => {
   );
 
   if (!updatePost) {
-    return next(new ErrorHandler("Something went wrong", 404));
+    return next(new ErrorHandler("Something went wrong", 400));
   }
 
   res.status(201).json({ success: true });
 });
 
 // like and unlike a post
-// const likePost = catchAsync(async (req, res, next) => {
-//   if (!mongoose.isValidObjectId(req.params.id)) {
-//     return next(new ErrorHandler("Invalid User ID", 404));
-//   }
+const likePost = catchAsync(async (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return next(new ErrorHandler("Invalid Post ID", 404));
+  }
 
-//   const postId = req.params.id;
+  const postId = req.params.id;
 
-//   // like a post
-//   const like = await Post.findByIdAndUpdate(
-//     { _id: postId },
-//     { $push: { likes: req.user.userId } },
-//     { new: true }
-//   );
-// });
+  // check if user already liked the post
+  const checkIfLiked = await Post.findOne({
+    _id: postId,
+    likes: req.user.userId,
+  });
 
-module.exports = { createPost, getPost, createComment };
+  if (!checkIfLiked) {
+    // like a post
+    const like = await Post.findByIdAndUpdate(
+      { _id: postId },
+      { $push: { likes: req.user.userId } },
+      { new: true }
+    );
+
+    if (!like) {
+      return next(new ErrorHandler("Something went wrong", 400));
+    }
+
+    res
+      .status(200)
+      .json({ msg: "Liked the post", likesCount: like.likes.length });
+  } else {
+    // preventing a user to like a post multiple times
+    const preventMultipleLikes = await Post.findByIdAndUpdate(
+      { _id: postId },
+      { $pull: { likes: req.user.userId } },
+      { new: true }
+    );
+
+    if (!preventMultipleLikes) {
+      return next(new ErrorHandler("Something went wrong", 400));
+    }
+
+    res.status(200).json({
+      msg: "Disliked the post",
+      likesCount: preventMultipleLikes.likes.length,
+    });
+  }
+});
+
+module.exports = { createPost, getPost, createComment, likePost };
