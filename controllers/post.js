@@ -1,6 +1,8 @@
 const Post = require("../models/post");
 const catchAsync = require("../middlewares/catchAsync");
 const ErrorHandler = require("../middlewares/errorHandler");
+const comments = require("../models/comments");
+const { default: mongoose } = require("mongoose");
 
 //creating post
 const createPost = catchAsync(async (req, res, next) => {
@@ -39,6 +41,10 @@ const getPost = catchAsync(async (req, res, next) => {
       path: "createdBy",
       select: "_id name username image",
     })
+    .populate({
+      path: "comments",
+      select: "_id name username image commentcontent createdAt",
+    })
     .sort({ createdAt: -1 });
 
   if (!posts) {
@@ -49,5 +55,33 @@ const getPost = catchAsync(async (req, res, next) => {
 });
 
 //comment on a post
+const createComment = catchAsync(async (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return next(new ErrorHandler("Invalid Post Id", 400));
+  }
+  const postId = req.params.id;
+  const commentContent = req.body.commentContent;
 
-module.exports = { createPost, getPost };
+  const saveComment = await comments.create({
+    image: req.user.userImage,
+    username: req.user.username,
+    name: req.user.name,
+    commentContent: commentContent,
+  });
+
+  saveComment.save();
+
+  const updatePost = await Post.findByIdAndUpdate(
+    { _id: postId },
+    { $push: { comments: saveComment._id } },
+    { new: true }
+  );
+
+  if (!updatePost) {
+    return next(new ErrorHandler("Something went wrong", 404));
+  }
+
+  res.status(201).json({ success: true });
+});
+
+module.exports = { createPost, getPost, createComment };

@@ -15,6 +15,7 @@ const authentication = catchAsync(async (req, res, next) => {
   const payload = jwt.verify(token, process.env.secretKey);
 
   req.user = {
+    userImage: payload.userImage,
     userId: payload.userId,
     name: payload.name,
     username: payload.username,

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const User = require("./user");
+const comments = require("./comments");
 
 const postSchema = new mongoose.Schema({
   caption: {
@@ -18,6 +19,12 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: User,
   },
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: comments,
+    },
+  ],
 });
 
 module.exports = mongoose.model("Post", postSchema);

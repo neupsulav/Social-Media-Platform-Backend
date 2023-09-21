@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 
 const commentSchema = new mongoose.Schema({
+  image: {
+    type: String,
+  },
   username: {
     type: String,
   },
@@ -9,6 +12,7 @@ const commentSchema = new mongoose.Schema({
   },
   commentContent: {
     type: String,
+    required: true,
   },
   createdAt: {
     type: Date,

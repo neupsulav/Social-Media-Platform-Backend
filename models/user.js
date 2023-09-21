@@ -59,6 +59,7 @@ UserSchema.methods.comparePassword = async function (password) {
 UserSchema.methods.getJwt = async function () {
   const token = jwt.sign(
     {
+      userImage: this.image,
       userId: this._id,
       name: this.name,
       username: this.username,
