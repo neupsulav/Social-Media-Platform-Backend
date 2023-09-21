@@ -8,6 +8,7 @@ const {
   getPost,
   createComment,
   likePost,
+  getSinglePost,
 } = require("../controllers/post");
 
 // multer for image upload on post
@@ -50,5 +51,7 @@ router.get("/", getPost);
 router.post("/comment/:id", authentication, createComment);
 
 router.post("/like/:id", authentication, likePost);
+
+router.get("/:id", authentication, getSinglePost);
 
 module.exports = router;

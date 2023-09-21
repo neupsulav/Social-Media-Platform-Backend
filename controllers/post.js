@@ -131,4 +131,34 @@ const likePost = catchAsync(async (req, res, next) => {
   }
 });
 
-module.exports = { createPost, getPost, createComment, likePost };
+// getting a single post
+const getSinglePost = catchAsync(async (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return next(new ErrorHandler("Invalid Post ID", 400));
+  }
+  const post = await Post.findOne({ _id: req.params.id })
+    .populate({
+      path: "createdBy",
+      select: "_id name username image",
+    })
+    .populate({
+      path: "comments",
+      select: "_id name username image commentContent createdAt",
+    });
+
+  if (!post) {
+    return next(
+      new ErrorHandler(`Post with id ${req.params.id} not found`, 404)
+    );
+  }
+
+  res.status(200).send(post);
+});
+
+module.exports = {
+  createPost,
+  getPost,
+  createComment,
+  likePost,
+  getSinglePost,
+};
