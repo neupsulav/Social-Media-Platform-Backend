@@ -5,6 +5,7 @@ const errorHandlerMiddleware = require("./middlewares/ErrorHandlerMiddleware");
 const connectDabatase = require("./db/connect");
 const authRouter = require("./routers/auth");
 const postRouter = require("./routers/post");
+const followRouter = require("./routers/follow");
 
 const app = express();
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(
 );
 app.use("/api/auth", authRouter);
 app.use("/api/post", postRouter);
+app.use("/api/user", followRouter);
 
 //error handler middleware
 app.use(errorHandlerMiddleware);
