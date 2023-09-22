@@ -11,7 +11,7 @@ const followOther = catchAsync(async (req, res, next) => {
 
   // to follow someone
   // check if already followed
-  const ifAlreadyFollowing = await User.find({
+  const ifAlreadyFollowing = await User.findOne({
     _id: req.user.userId,
     following: userId,
   });
