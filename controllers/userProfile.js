@@ -48,4 +48,46 @@ const userProfileData = catchAsync(async (req, res, next) => {
   }
 });
 
-module.exports = { userProfileData };
+// to get the list of people whom the user is following
+const followingList = catchAsync(async (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return next(new ErrorHandler("Invalid userId", 400));
+  }
+
+  const userId = req.params.id;
+
+  //   to get the following list
+  const followingList = await User.findById({ _id: userId }).populate({
+    path: "following",
+    select: "_id name username image",
+  });
+
+  if (followingList.following.length == 0) {
+    res.status(200).send("Currently user is not following anyone");
+  }
+
+  res.status(200).json({ list: followingList.following });
+});
+
+// to get the list of people who are following the user
+const followersList = catchAsync(async (req, res, next) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return next(new ErrorHandler("Invalid userId", 400));
+  }
+
+  const userId = req.params.id;
+
+  //   to get the followers list
+  const followersList = await User.findById({ _id: userId }).populate({
+    path: "followers",
+    select: "_id name username image",
+  });
+
+  if (followersList.followers.length == 0) {
+    res.status(200).send("Currently no one is following the user");
+  }
+
+  res.status(200).json({ list: followersList.followers });
+});
+
+module.exports = { userProfileData, followingList, followersList };
