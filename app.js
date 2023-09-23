@@ -10,6 +10,7 @@ const adminRouter = require("./routers/admin");
 const usersRouter = require("./routers/users");
 const emailVerificationRouter = require("./routers/emailVerification");
 const profileRouter = require("./routers/profile");
+const userProfileRouter = require("./routers/userProfile");
 
 const app = express();
 dotenv.config();
@@ -33,6 +34,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api", usersRouter);
 app.use("/api", emailVerificationRouter);
 app.use("/api", profileRouter);
+app.use("/api", userProfileRouter);
 
 //error handler middleware
 app.use(errorHandlerMiddleware);
