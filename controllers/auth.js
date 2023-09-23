@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const catchAsync = require("../middlewares/catchAsync");
 const ErrorHandler = require("../middlewares/errorHandler");
+const { sendVerificationMail } = require("./emailVerification");
 
 //user registration
 const userRegistration = catchAsync(async (req, res, next) => {
@@ -33,6 +34,9 @@ const userRegistration = catchAsync(async (req, res, next) => {
         new ErrorHandler("Something went wrong, User not created!", 500)
       );
     }
+
+    // send verification mail
+    sendVerificationMail(req.body.name, req.body.email, newUser._id);
   } else {
     const filename = file.filename;
     const basepath = `${req.protocol}://${req.get(
@@ -55,9 +59,15 @@ const userRegistration = catchAsync(async (req, res, next) => {
         new ErrorHandler("Something went wrong, User not created!", 500)
       );
     }
+
+    // send verification mail
+    sendVerificationMail(req.body.name, req.body.email, newUser._id);
   }
 
-  res.status(201).json({ success: true, msg: "User created successfully" });
+  res.status(201).json({
+    success: true,
+    msg: "An email has been sent. Please verify your account.",
+  });
 });
 
 //user login
@@ -73,6 +83,12 @@ const userLogin = catchAsync(async (req, res, next) => {
 
   if (!isEmailFound) {
     return next(new ErrorHandler("Invalid credentials", 401));
+  }
+
+  if (!isEmailFound.isVerified) {
+    return next(
+      new ErrorHandler("Email is not verified. Please verify your email", 401)
+    );
   }
 
   // comparing hashed password
