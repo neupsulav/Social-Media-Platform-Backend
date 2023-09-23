@@ -3,15 +3,17 @@ const ErrorHandler = require("../middlewares/errorHandler");
 const User = require("../models/user");
 const Post = require("../models/post");
 
-// to get our profile data
 const selfProfileData = catchAsync(async (req, res, next) => {
+  // to get our profile data
   const profileData = await User.findById({ _id: req.user.userId }).select(
     "-_id name username email image followers following"
   );
 
+  //   to get followers and following count
   const followersCount = profileData.followers.length;
   const followingCount = profileData.following.length;
 
+  //   to get posts which we posted
   const userPosts = await Post.find({ createdBy: req.user.userId })
     .select("-_id caption images likes comments createdAt createdBy")
     .populate({ path: "createdBy", select: "name username image -_id" })
