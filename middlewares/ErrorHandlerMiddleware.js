@@ -4,7 +4,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
 
   if (err.code == 11000) {
     return res
-      .status(400)
+      .status(403)
       .json({ status: "Error", msg: "User already exists" });
   }
 
