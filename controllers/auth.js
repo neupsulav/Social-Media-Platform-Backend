@@ -87,7 +87,7 @@ const userLogin = catchAsync(async (req, res, next) => {
 
   if (!isEmailFound.isVerified) {
     return next(
-      new ErrorHandler("Email is not verified. Please verify your email", 401)
+      new ErrorHandler("Email is not verified. Please verify your email", 406)
     );
   }
 
@@ -99,6 +99,12 @@ const userLogin = catchAsync(async (req, res, next) => {
   }
 
   const token = await isEmailFound.getJwt();
+
+  // to set cookies directly(time is in milliseconds)
+  // res.cookie("jwt", token, {
+  //   expires: new Date(Date.now() + 2592000),
+  //   httpOnly: true,
+  // });
 
   res.status(200).json({ msg: "Logged in successfully", token: token });
 });

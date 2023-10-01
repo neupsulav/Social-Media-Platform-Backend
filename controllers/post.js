@@ -3,6 +3,7 @@ const catchAsync = require("../middlewares/catchAsync");
 const ErrorHandler = require("../middlewares/errorHandler");
 const comments = require("../models/comments");
 const { default: mongoose } = require("mongoose");
+const User = require("../models/user");
 
 //creating post
 const createPost = catchAsync(async (req, res, next) => {
@@ -19,6 +20,11 @@ const createPost = catchAsync(async (req, res, next) => {
     });
   }
 
+  if (!files && !req.body.caption) {
+    return next(
+      new ErrorHandler("Post cannot be created without image and caption", 400)
+    );
+  }
   const post = await Post.create({
     caption: req.body.caption,
     images: imagePaths,
@@ -36,7 +42,9 @@ const createPost = catchAsync(async (req, res, next) => {
 
 //get posts
 const getPost = catchAsync(async (req, res, next) => {
-  const posts = await Post.find({})
+  const thisUser = await User.findById({ _id: req.user.userId });
+
+  const posts = await Post.find({ createdBy: thisUser.following })
     .populate({
       path: "createdBy",
       select: "_id name username image",
@@ -50,8 +58,11 @@ const getPost = catchAsync(async (req, res, next) => {
   if (!posts) {
     return next(new ErrorHandler("Something went wrong!", 400));
   }
-
-  res.status(200).json(posts);
+  if (posts.length === 0) {
+    res.status(200).json([]);
+  } else {
+    res.status(200).json(posts);
+  }
 });
 
 //comment on a post
@@ -130,6 +141,22 @@ const likePost = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+// // get likes count for a post
+// const getLikesCount = catchAsync(async (req, res, next) => {
+//   if (!mongoose.isValidObjectId(req.params.id)) {
+//     return next(new ErrorHandler("Invalid Post ID", 400));
+//   }
+
+//   const postId = req.params.id;
+
+//   const post = await Post.findById({ _id: postId });
+
+//   if (!post) {
+//     return next(new ErrorHandler("Post not found", 404));
+//   }
+//   res.status(200).send(post.likes);
+// });
 
 // getting a single post
 const getSinglePost = catchAsync(async (req, res, next) => {

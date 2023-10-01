@@ -11,6 +11,7 @@ const {
   getSinglePost,
   updatePost,
   deletePost,
+  getLikesCount,
 } = require("../controllers/post");
 const ownerValidation = require("../middlewares/ownerValidation");
 
@@ -49,11 +50,13 @@ router.post(
   createPost
 );
 
-router.get("/", getPost);
+router.get("/", authentication, getPost);
 
 router.post("/comment/:id", authentication, createComment);
 
 router.post("/like/:id", authentication, likePost);
+
+// router.get("/likecount/:id", getLikesCount);
 
 router.get("/:id", authentication, getSinglePost);
 
