@@ -15,12 +15,13 @@ const selfProfileData = catchAsync(async (req, res, next) => {
 
   //   to get posts which we posted
   const userPosts = await Post.find({ createdBy: req.user.userId })
-    .select("-_id caption images likes comments createdAt createdBy")
+    // .select("_id caption images likes comments createdAt createdBy")
     .populate({ path: "createdBy", select: "name username image -_id" })
     .populate({
       path: "comments",
       select: "-_id name username image commentContent createdAt",
-    });
+    })
+    .sort({ createdAt: -1 });
 
   res
     .status(200)
@@ -34,11 +35,11 @@ const followingList = catchAsync(async (req, res, next) => {
     select: "_id name username image",
   });
 
-  if (followingList.following.length == 0) {
-    res.status(200).send("Currently you are not following any users");
-  }
+  // if (followingList.following.length == 0) {
+  //   res.status(200).json("Currently you are not following any users");
+  // }
 
-  res.status(200).json({ list: followingList.following });
+  res.status(200).json(followingList.following);
 });
 
 // to get the users who are following us
@@ -48,11 +49,11 @@ const followersList = catchAsync(async (req, res, next) => {
     select: "_id name username image",
   });
 
-  if (followersList.followers.length == 0) {
-    res.status(200).send("Currently you are not being followed by anyone");
-  }
+  // if (followersList.followers.length == 0) {
+  //   res.status(200).json({});
+  // }
 
-  res.status(200).json({ list: followersList.followers });
+  res.status(200).json(followersList.followers);
 });
 
 module.exports = { selfProfileData, followingList, followersList };

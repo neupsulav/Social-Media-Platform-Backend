@@ -9,10 +9,10 @@ const {
 } = require("../controllers/userProfile");
 
 // routes
-router.get("/user/profile/:id", authentication, userProfileData);
+router.get("/user/profile/:username", authentication, userProfileData);
 
-router.get("/user/profile/following/:id", authentication, followingList);
+router.get("/user/profile/following/:username", authentication, followingList);
 
-router.get("/user/profile/followers/:id", authentication, followersList);
+router.get("/user/profile/followers/:username", authentication, followersList);
 
 module.exports = router;
